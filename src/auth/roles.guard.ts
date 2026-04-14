@@ -32,8 +32,10 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<{ user: RequestUser }>();
     const user = request.user;
 
-    if (!user) {
-      return false;
+    if (!user || !user.role) {
+      throw new ForbiddenException(
+        'Clearance Denied: No valid citizen credentials detected.',
+      );
     }
 
     const hasPermission = requiredRoles.some((role) => user.role === role);

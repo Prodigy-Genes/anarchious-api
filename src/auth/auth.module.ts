@@ -8,6 +8,7 @@ import { CitizensModule } from '../citizens/citizens.module';
 import { JwtStrategy } from './jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './roles.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Module({
   imports: [
@@ -27,6 +28,10 @@ import { RolesGuard } from './roles.guard';
   providers: [
     AuthService,
     JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
