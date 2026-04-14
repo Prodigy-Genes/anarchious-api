@@ -1,26 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { District } from './entities/district.entity';
 import { CreateDistrictDto } from './dto/create-district.dto';
 import { UpdateDistrictDto } from './dto/update-district.dto';
 
 @Injectable()
 export class DistrictsService {
-  create(createDistrictDto: CreateDistrictDto) {
-    return 'This action adds a new district';
+  constructor(
+    @InjectRepository(District)
+    private readonly districtRepo: Repository<District>,
+  ) {}
+
+  async create(createDistrictDto: CreateDistrictDto): Promise<District> {
+    const district = this.districtRepo.create(createDistrictDto);
+    return await this.districtRepo.save(district);
   }
 
-  findAll() {
-    return `This action returns all districts`;
+  async findAll(): Promise<District[]> {
+    return await this.districtRepo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} district`;
+  async findOne(id: string): Promise<District> {
+    const district = await this.districtRepo.findOneBy({ id });
+    if (!district) {
+      throw new NotFoundException(`District with ID ${id} not found`);
+    }
+    return district;
   }
 
-  update(id: number, updateDistrictDto: UpdateDistrictDto) {
-    return `This action updates a #${id} district`;
+  async update(
+    id: string,
+    updateDistrictDto: UpdateDistrictDto,
+  ): Promise<District> {
+    const district = await this.findOne(id);
+    const updated = Object.assign(district, updateDistrictDto);
+    return await this.districtRepo.save(updated);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} district`;
+  async remove(id: string): Promise<void> {
+    const result = await this.districtRepo.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`District with ID ${id} not found`);
+    }
   }
 }

@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { District } from './src/districts/entities/district.entity';
+import { Citizen } from './src/citizens/entities/citizen.entity';
 import * as dotenv from 'dotenv';
 
 dotenv.config(); // This loads the .env file manually for the CLI
@@ -11,6 +12,6 @@ export default new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  entities: [District],
+  entities: [District, Citizen],
   migrations: ['./src/migrations/*.ts'],
 });
