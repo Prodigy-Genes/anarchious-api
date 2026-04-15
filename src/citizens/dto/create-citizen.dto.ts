@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
+  IsUUID,
   MinLength,
 } from 'class-validator';
 import { CitizenRole } from '../entities/citizen.entity';
@@ -22,4 +23,8 @@ export class CreateCitizenDto {
   })
   @IsOptional()
   role?: CitizenRole;
+
+  @IsUUID()
+  @IsOptional()
+  districtId?: string; // The ID of the district they belong to
 }

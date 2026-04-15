@@ -6,7 +6,7 @@ import { Citizen } from '../citizens/entities/citizen.entity';
 import bcrypt from 'bcrypt';
 
 // Define what a "Safe" citizen looks like (everything except the password)
-type CitizenWithoutPassword = Omit<Citizen, 'password'>;
+type CitizenWithoutPassword = Omit<Citizen, 'password' | 'district'>;
 
 @Injectable()
 export class AuthService {

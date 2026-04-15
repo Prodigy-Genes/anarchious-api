@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import bcrypt from 'bcrypt';
 import { Citizen } from './entities/citizen.entity';
 import { CreateCitizenDto } from './dto/create-citizen.dto';
+import { District } from '../districts/entities/district.entity';
 
 @Injectable()
 export class CitizensService {
@@ -20,7 +21,7 @@ export class CitizensService {
   }
 
   async create(createCitizenDto: CreateCitizenDto): Promise<Citizen> {
-    const { email, password, role } = createCitizenDto;
+    const { email, password, role, districtId } = createCitizenDto;
 
     // Check if the email is already registered in the city
     const existingCitizen = await this.citizenRepo.findOne({
@@ -43,11 +44,19 @@ export class CitizensService {
       role,
     });
 
+    // If a districtId was provided, attach the district object
+    if (districtId) {
+      newCitizen.district = { id: districtId } as District;
+      // Pro-tip: TypeORM is smart enough to just use the ID here
+    }
+
     // Save and return (remember: password will be hidden due to { select: false })
     return await this.citizenRepo.save(newCitizen);
   }
 
   async findAll(): Promise<Citizen[]> {
-    return await this.citizenRepo.find();
+    return await this.citizenRepo.find({
+      relations: ['district'],
+    });
   }
 }

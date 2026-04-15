@@ -17,12 +17,19 @@ export class DistrictsService {
     return await this.districtRepo.save(district);
   }
 
+  // Optional: We could add relations: ['citizens'] here too if
+  // you want the "Grand Registry" view to show counts/names.
   async findAll(): Promise<District[]> {
     return await this.districtRepo.find();
   }
 
   async findOne(id: string): Promise<District> {
-    const district = await this.districtRepo.findOneBy({ id });
+    // We upgrade findOneBy to findOne to support 'relations'
+    const district = await this.districtRepo.findOne({
+      where: { id },
+      relations: ['citizens'], // <--- The Intelligence Layer
+    });
+
     if (!district) {
       throw new NotFoundException(`District with ID ${id} not found`);
     }
@@ -39,9 +46,8 @@ export class DistrictsService {
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.districtRepo.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`District with ID ${id} not found`);
-    }
+    // By using the existing findOne, we verify existence first
+    const district = await this.findOne(id);
+    await this.districtRepo.remove(district);
   }
 }

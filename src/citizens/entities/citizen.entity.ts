@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { District } from '../../districts/entities/district.entity';
 
 // Define the hierarchy of Anarchious
 export enum CitizenRole {
@@ -41,4 +43,9 @@ export class Citizen {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @ManyToOne(() => District, (district) => district.citizens, {
+    onDelete: 'SET NULL', // If a district is deleted, citizens just become homeless (null)
+  })
+  district!: District;
 }
